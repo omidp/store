@@ -28,12 +28,15 @@ public class BasicDataSetup {
 	private final SessionFactory sessionFactory;
 	private final OrderService orderService;
 
-	public void init() {
+	/**
+	 * @return orderId
+	 */
+	public Long init() {
 		sessionFactory.inTransaction(this::initProducts);
-		sessionFactory.inTransaction(this::initOrders);
+		return sessionFactory.fromTransaction(this::initOrders);
 	}
 
-	private void initOrders(Session session) {
+	private Long initOrders(Session session) {
 		long orderId = nextLong();
 		log.info("##################################################################");
 		log.info("Creating order with id {}", orderId);
@@ -43,6 +46,7 @@ public class BasicDataSetup {
 		orderBread(session, order);
 		orderVegetables(session, order);
 		orderBeers(session, order);
+		return orderId;
 	}
 
 	private void orderBeers(Session session, OrderEntity order) {
