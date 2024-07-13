@@ -1,0 +1,74 @@
+## Online Grocery Store
+
+### Overview
+
+store is a Spring boot Java-based application designed to enable customers to buy with good promotions and discounts.
+
+
+### Prerequisites
+To run this project, you will need the following:
+
+- Java Development Kit (JDK) 17 or higher
+- Apache Maven 3.6.3 or higher
+
+### Tech Stack
+
+- Spring boot
+- Hibernate
+- Drools rule engine
+- H2 in-memory db
+
+### Installation
+1. Clone/Download the repository.
+2. Build the project using maven.
+```
+mvn clean install
+```
+3. To run the application, use the following command:
+```
+./run.sh
+```
+When store is successfully up & running, you will see order id which you can use to fetch the details
+
+```
+##################################################################
+Creating order with id 3920167104166525682
+##################################################################
+```
+
+#### Fetch product list
+
+```
+curl --location 'http://localhost:8080/products'
+```
+
+#### Fetch Order details
+
+```
+curl --location --globoff 'http://localhost:8080/orders/{orderId}/details'
+```
+
+#### Fetch Receipt
+
+```
+curl --location --globoff 'http://localhost:8080/orders/{orderId}'
+```
+
+Or you can use Postman collection attached to the project.
+
+### Areas for Improvement
+
+- Is total calculated amount correct after applying rules ?
+- Receipt print items and how it should look like.
+- Do we need to keep track of discount amount and price ? currently we keep both
+- Some TODOs in the code.
+
+### Why I chose Drools for this project, where are my rules ?
+
+You can define rules using spreadsheets. It's more human-readable, no offence to developers.
+
+Having a simpler and more concrete language provides us with a great advantage:
+- we can include Subject Matter Experts (SME) without technical knowledge in the development cycle.
+- Business requirements no longer have to be translated into technical artifacts (such as classes, rules, and so on) by the developers. The people writing these artifacts can be the people who have business expertise.
+
+For instance : You can simply change BEERS discount percentage without compiling the code. please visit _discount_rule.xlsx_. 

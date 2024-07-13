@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "8bcf8590-47ab-4e7b-8664-a3644e0deb8c",
+		"name": "grocery-store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2417979"
+	},
+	"item": [
+		{
+			"name": "product list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "receipt",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/orders/{orderId}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"{orderId}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "order details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/orders/{orderId}/details",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders",
+						"{orderId}",
+						"details"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
