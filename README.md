@@ -28,7 +28,7 @@ mvn clean install
 ```
 java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED -jar store.jar
 ```
-4. To run the application, use the following command:
+4. After building with maven to run the application, use the following command:
 ```
 ./run.sh
 ```
