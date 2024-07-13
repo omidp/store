@@ -50,6 +50,7 @@ public class OrderItemEntity extends PO {
 	)
 	@MapKeyEnumerated(EnumType.STRING)
 	@Column(name = "attribute_value")
+	//@JdbcTypeCode( SqlTypes.JSON ) It might be easier to use JSON here
 	private Map<ProductAttribute, String> attributes = new HashMap<>();
 
 	public OrderItemEntity(long id, BigDecimal unitPrice, int orderedQuantity, ProductEntity product, OrderEntity order) {
