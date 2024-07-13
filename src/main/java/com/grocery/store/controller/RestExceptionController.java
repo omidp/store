@@ -12,7 +12,7 @@ public class RestExceptionController {
 
 	@ExceptionHandler(value = {NotFoundException.class})
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	public ErrorMessage handleCsvException(NotFoundException ex) {
+	public ErrorMessage handleNotFoundException(NotFoundException ex) {
 		return new ErrorMessage(0, ex.getMessage());
 	}
 

@@ -31,17 +31,18 @@ public class OrderService {
 	private final RuleFactService ruleFactService;
 
 	public OrderTotalResponse getById(Long orderId) {
+		String hql = """
+			select NEW com.grocery.store.model.OrderItemTotalResponse(cast(sum(oi.price) as java.math.BigDecimal), cast(sum(oi.quantity) as Integer), p.category) 
+			from OrderItemEntity oi
+			left join oi.product p					
+			where oi.order.id = :orderId
+			group by p.category
+			""";
 		return sessionFactory.fromSession(session -> {
 			OrderEntity orderEntity = session.get(OrderEntity.class, orderId);
 			if (orderEntity == null) {
 				throw new NotFoundException("Order not found. orderId #" + orderId);
 			}
-			var hql = """
-			select NEW com.grocery.store.model.OrderItemTotalResponse(cast(sum(oi.price) as java.math.BigDecimal), cast(sum(oi.quantity) as Integer), p.category) from OrderItemEntity oi
-			left join oi.product p
-			where oi.order.id = :orderId
-			group by p.category
-			""";
 			List<OrderItemTotalResponse> resultList = session.createSelectionQuery(hql, OrderItemTotalResponse.class).setParameter("orderId", orderId).getResultList();
 			BigDecimal totalAmount = resultList.stream().map(OrderItemTotalResponse::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			return new OrderTotalResponse(totalAmount, resultList);
@@ -49,18 +50,18 @@ public class OrderService {
 	}
 
 	public OrderResponse getDetailsById(Long orderId) {
+		String hql = """
+				from OrderItemEntity oi 
+				left join fetch oi.product p
+				left join fetch oi.attributes attr
+				where oi.order.id = :orderId
+				""";
 		return sessionFactory.fromSession(session -> {
 			//TODO: fetch data with one query
 			OrderEntity orderEntity = session.get(OrderEntity.class, orderId);
 			if (orderEntity == null) {
 				throw new NotFoundException("Order not found. orderId #" + orderId);
 			}
-			var hql = """
-				from OrderItemEntity oi 
-				left join fetch oi.product p
-				left join fetch oi.attributes attr
-				where oi.order.id = :orderId
-				""";
 			List<OrderItemResponse> items = session.createSelectionQuery(hql, OrderItemEntity.class).setParameter("orderId", orderId).getResultList()
 				.stream().map(orderItem -> OrderItemResponse.of(orderItem, orderItem.getProduct(), orderItem.getAttributes()))
 				.toList();
@@ -77,7 +78,7 @@ public class OrderService {
 		if (attributes != null) {
 			orderItem.setAttributes(attributes);
 		}
-		OrderItemRuleOutput output = ruleFactService.collectFact(product, orderItem).getResult();
+		OrderItemRuleOutput output = ruleFactService.collectFact(product, orderItem, orderItem.getAttributes()).getResult();
 		if (output != null) {
 			orderItem.setPrice(output.getPrice());
 			orderItem.setQuantity(output.getQty());

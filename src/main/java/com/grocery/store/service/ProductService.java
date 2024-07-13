@@ -16,13 +16,10 @@ public class ProductService {
 
 	public List<ProductResponse> get() {
 		return sessionFactory.fromTransaction(session -> session.createSelectionQuery("from ProductEntity p", ProductEntity.class)
+//TODO: add pagination			.setPage()
 			.getResultList()
 			.stream()
-			.map(this::convert)
+			.map(ProductResponse::of)
 			.toList());
-	}
-
-	private ProductResponse convert(ProductEntity product) {
-		return ProductResponse.of(product);
 	}
 }

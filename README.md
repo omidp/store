@@ -36,7 +36,7 @@ When store is successfully up & running, you will see order id which you can use
 
 ```
 ##################################################################
-Creating order with id 3920167104166525682
+Created order with id 3920167104166525682
 ##################################################################
 ```
 

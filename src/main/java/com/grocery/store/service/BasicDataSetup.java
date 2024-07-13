@@ -38,14 +38,14 @@ public class BasicDataSetup {
 
 	private Long initOrders(Session session) {
 		long orderId = nextLong();
-		log.info("##################################################################");
-		log.info("Creating order with id {}", orderId);
-		log.info("##################################################################");
 		OrderEntity order = new OrderEntity(orderId, "Order #" + orderId);
 		session.persist(order);
 		orderBread(session, order);
 		orderVegetables(session, order);
 		orderBeers(session, order);
+		log.info("##################################################################");
+		log.info("Created order with id {}", orderId);
+		log.info("##################################################################");
 		return orderId;
 	}
 
