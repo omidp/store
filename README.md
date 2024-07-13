@@ -75,4 +75,18 @@ Having a simpler and more concrete language provides us with a great advantage:
 - we can include Subject Matter Experts (SME) without technical knowledge in the development cycle.
 - Business requirements no longer have to be translated into technical artifacts (such as classes, rules, and so on) by the developers. The people writing these artifacts can be the people who have business expertise.
 
-For instance : You can simply change BEERS discount percentage without compiling the code. please visit _discount_rule.xlsx_. 
+For instance : You can simply change BEERS discount percentage without compiling the code. please visit _discount_rule.xlsx_.
+
+#### Troubleshooting 
+
+If you get the error
+
+```
+Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass
+```
+
+make sure you have added following JVM arguments. 
+
+```
+--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
+```
