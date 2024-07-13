@@ -24,11 +24,11 @@ To run this project, you will need the following:
 ```
 mvn clean install
 ```
-4. You don't have maven, download a zip file from [here](https://github.com/omidp/store/releases/download/1.0/store.zip), change the extension to jar and execute following command.
+3. You don't have maven, download a zip file from [here](https://github.com/omidp/store/releases/download/1.0/store.zip), change the extension to jar and execute following command.
 ```
 java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED -jar store.jar
 ```
-5. To run the application, use the following command:
+4. To run the application, use the following command:
 ```
 ./run.sh
 ```
