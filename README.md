@@ -24,7 +24,7 @@ To run this project, you will need the following:
 ```
 mvn clean install
 ```
-3. You don't have maven, download a zip file from [here](https://github.com/omidp/store/releases/download/2.0/store.jar), change the extension to jar and execute following command.
+3. If You don't have maven, download the release jar file from [here](https://github.com/omidp/store/releases/download/2.0/store.jar), execute following command.
 ```
 java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED -jar store.jar
 ```
