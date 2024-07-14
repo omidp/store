@@ -9,7 +9,7 @@ store is a Spring boot Java-based application designed to enable customers to bu
 To run this project, you will need the following:
 
 - Java Development Kit (JDK) 17 or higher
-- Apache Maven 3.6.3 or higher
+- Apache Maven 3.6.3 or higher. (You can skip this if you download jar file from release)
 
 ### Tech Stack
 
