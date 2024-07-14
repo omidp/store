@@ -94,6 +94,25 @@ public class OrderControllerIntegrationTest {
 
 	}
 
+	@Test
+	void testCreateOrderQtyValidation() throws Exception {
+		var requestBody = """
+			{
+			    "items":[
+			        {
+			            "productId":11,
+			            "qty":0
+			        }
+			    ]
+			}
+			""";
+		mockMvc.perform(post("/orders").contentType(APPLICATION_JSON).content(requestBody))
+			.andExpect(status().isBadRequest())
+			.andExpect(content().string("[{\"code\":0,\"message\":\"items[0].qty must be greater than or equal to 1\"}]"))
+		;
+
+	}
+
 	private String getResponse() throws JsonProcessingException {
 		var items = List.of(
 			new OrderItemTotalResponse(new BigDecimal("1.00"), 6, BEERS),
