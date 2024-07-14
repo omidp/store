@@ -76,7 +76,7 @@ public class BasicDataSetup {
 		session.persist(new ProductEntity(13, BEERS, null, "Belgium beer", valueOf(0.5), null));
 		session.persist(new ProductEntity(14, BEERS, null, "Dutch beer", valueOf(0.5), null));
 		session.persist(new ProductEntity(15, BEERS, null, "German beer", valueOf(0.5), null));
-		session.persist(new ProductEntity(21, BEERS, null, "Aragh Sagi", valueOf(0.5), null));
+		session.persist(new ProductEntity(21, BEERS, null, "Aragh Sagi", valueOf(1.5), null));
 	}
 
 	private void initVegetables(Session session) {

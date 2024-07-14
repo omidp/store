@@ -1,5 +1,6 @@
 package com.grocery.store.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grocery.store.IntegrationTestContextConfig;
 import com.grocery.store.model.OrderItemTotalResponse;
@@ -22,7 +23,9 @@ import static com.grocery.store.domain.Category.BEERS;
 import static com.grocery.store.domain.Category.BREADS;
 import static com.grocery.store.domain.Category.VEGETABLES;
 import static java.math.BigDecimal.valueOf;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,16 +55,52 @@ public class OrderControllerIntegrationTest {
 
 	@Test
 	void testGetById() throws Exception {
+		mockMvc.perform(get("/orders/{id}", orderId.getIdentifier()))
+			.andExpect(status().isOk())
+			.andExpect(content().string(getResponse()))
+		;
+
+	}
+
+	@Test
+	void testCreateOrder() throws Exception {
+		var requestBody = """
+			{
+			    "items":[
+			        {
+			            "productId":11,
+			            "qty":1
+			        },
+			        {
+			            "productId":10,
+			            "qty":1
+			        },
+			        {
+			            "productId":16,
+			            "qty":1,
+			            "attributes":{"WEIGHT":"200"}
+			        },
+			        {
+			            "productId":14,
+			            "qty":6           
+			        }
+			    ]
+			}
+			""";
+		mockMvc.perform(post("/orders").contentType(APPLICATION_JSON).content(requestBody))
+			.andExpect(status().isCreated())
+			.andExpect(content().string(getResponse()))
+		;
+
+	}
+
+	private String getResponse() throws JsonProcessingException {
 		var items = List.of(
 			new OrderItemTotalResponse(new BigDecimal("1.00"), 6, BEERS),
 			new OrderItemTotalResponse(new BigDecimal("2.00"), 3, BREADS),
 			new OrderItemTotalResponse(valueOf(1.86), 1, VEGETABLES)
 		);
-		mockMvc.perform(get("/orders/{id}", orderId.getIdentifier()))
-			.andExpect(status().isOk())
-			.andExpect(content().string(MAPPER.writeValueAsString(new OrderTotalResponse(valueOf(4.86), items))))
-		;
-
+		return MAPPER.writeValueAsString(new OrderTotalResponse(valueOf(4.86), items));
 	}
 
 }
