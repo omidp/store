@@ -65,6 +65,34 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Create an order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items\":[\n        {\n            \"productId\":11,\n            \"qty\":1\n        },\n        {\n            \"productId\":10,\n            \"qty\":1\n        },\n        {\n            \"productId\":16,\n            \"qty\":1,\n            \"attributes\":{\"WEIGHT\":\"200\"}\n        },\n        {\n            \"productId\":14,\n            \"qty\":6            \n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/orders",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

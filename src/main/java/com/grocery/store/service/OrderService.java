@@ -6,11 +6,13 @@ import com.grocery.store.domain.OrderItemEntity;
 import com.grocery.store.domain.ProductAttribute;
 import com.grocery.store.domain.ProductEntity;
 import com.grocery.store.exception.NotFoundException;
+import com.grocery.store.model.OrderItemRequest;
 import com.grocery.store.model.OrderItemResponse;
-import com.grocery.store.model.rule.OrderItemRuleOutput;
 import com.grocery.store.model.OrderItemTotalResponse;
+import com.grocery.store.model.OrderRequest;
 import com.grocery.store.model.OrderResponse;
 import com.grocery.store.model.OrderTotalResponse;
+import com.grocery.store.model.rule.OrderItemRuleOutput;
 import com.grocery.store.service.rule.RuleFactService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
@@ -21,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.RandomUtils.nextLong;
 
 @Service
@@ -43,7 +46,9 @@ public class OrderService {
 			if (orderEntity == null) {
 				throw new NotFoundException("Order not found. orderId #" + orderId);
 			}
-			List<OrderItemTotalResponse> resultList = session.createSelectionQuery(hql, OrderItemTotalResponse.class).setParameter("orderId", orderId).getResultList();
+			List<OrderItemTotalResponse> resultList = session.createSelectionQuery(hql, OrderItemTotalResponse.class)
+				.setParameter("orderId", orderId)
+				.getResultList();
 			BigDecimal totalAmount = resultList.stream().map(OrderItemTotalResponse::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			return new OrderTotalResponse(totalAmount, resultList);
 		});
@@ -51,11 +56,11 @@ public class OrderService {
 
 	public OrderResponse getDetailsById(Long orderId) {
 		String hql = """
-				from OrderItemEntity oi 
-				left join fetch oi.product p
-				left join fetch oi.attributes attr
-				where oi.order.id = :orderId
-				""";
+			from OrderItemEntity oi 
+			left join fetch oi.product p
+			left join fetch oi.attributes attr
+			where oi.order.id = :orderId
+			""";
 		return sessionFactory.fromSession(session -> {
 			//TODO: fetch data with one query
 			OrderEntity orderEntity = session.get(OrderEntity.class, orderId);
@@ -69,15 +74,27 @@ public class OrderService {
 		});
 	}
 
+	public long insertOrderItem(OrderRequest orderRequest) {
+		return sessionFactory.fromTransaction(session -> {
+			long orderId = nextLong();
+			OrderEntity order = new OrderEntity(orderId, "Order #" + orderId);
+			session.persist(order);
+			for (OrderItemRequest item : orderRequest.items()) {
+				insertOrderItem(session.getReference(ProductEntity.class, item.productId()), order, item.attributes(), item.qty(), session);
+			}
+			return orderId;
+		});
+	}
 
 	public void insertOrderItem(ProductEntity product, OrderEntity order, Map<ProductAttribute, String> attributes, int qty, Session session) {
 		if (Category.BREADS.equals(product.getCategory()) && product.getExpiryDays() > 6) {
 			return;
 		}
-		OrderItemEntity orderItem = new OrderItemEntity(nextLong(), product.getPrice(), qty, product, order);
-		if (attributes != null) {
-			orderItem.setAttributes(attributes);
+		if (attributes == null) {
+			attributes = emptyMap();
 		}
+		OrderItemEntity orderItem = new OrderItemEntity(nextLong(), product.getPrice(), qty, product, order);
+		orderItem.setAttributes(attributes);
 		OrderItemRuleOutput output = ruleFactService.collectFact(product, orderItem, orderItem.getAttributes()).getResult();
 		if (output != null) {
 			orderItem.setPrice(output.getPrice());

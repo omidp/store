@@ -58,7 +58,77 @@ curl --location --globoff 'http://localhost:8080/orders/{orderId}/details'
 curl --location --globoff 'http://localhost:8080/orders/{orderId}'
 ```
 
+#### Create an Order
+
+Request Body :
+
+```
+curl --location 'http://localhost:8080/orders' \
+--header 'Content-Type: application/json' \
+--data '{
+    "items":[
+        {
+            "productId":11,
+            "qty":1
+        },
+        {
+            "productId":10,
+            "qty":1
+        },
+        {
+            "productId":16,
+            "qty":1,
+            "attributes":{"WEIGHT":"200"}
+        },
+        {
+            "productId":14,
+            "qty":6            
+        }
+    ]
+}'
+```
+
+Response body 
+
+```
+{
+    "totalAmount": 4.86,
+    "items": [
+        {
+            "amount": 1.00,
+            "quantity": 6,
+            "category": "BEERS"
+        },
+        {
+            "amount": 2.00,
+            "quantity": 3,
+            "category": "BREADS"
+        },
+        {
+            "amount": 1.86,
+            "quantity": 1,
+            "category": "VEGETABLES"
+        }
+    ]
+}
+```
+
 Or you can use Postman collection attached to the project.
+
+### Default Products
+
+| Id | Name          | Category   | Price (EURO) | mfg         |
+|----|---------------|------------|--------------|-------------|
+| 10 | Suikerbrood   | BREADS     | 1            | Today       |
+| 11 | Krentenbollen | BREADS     | 1            | 3 days ago  |
+| 12 | Kerststol     | BREADS     | 1            | 6 days ago  |
+| 25 | Sangak        | BREADS     | 1            | 10 days ago |
+| 16 | Lettuce       | VEGETABLES | 1 per 100g   |             |
+| 18 | Celery        | VEGETABLES | 1 per 100g   |             |
+| 13 | Belgium Beer  | BEERS      | 0.5          |             |
+| 14 | Dutch Beer    | BEERS      | 0.5          |             |
+| 15 | German Beer   | BEERS      | 0.5          |             |
+| 21 | Aragh Sagi    | BEERS      | 1.5          |             |
 
 ### Areas for Improvement
 
