@@ -4,6 +4,7 @@ import com.grocery.store.model.OrderRequest;
 import com.grocery.store.model.OrderResponse;
 import com.grocery.store.model.OrderTotalResponse;
 import com.grocery.store.service.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class OrderController {
 	}
 
 	@PostMapping
-	public ResponseEntity<OrderTotalResponse> createOrder(@RequestBody OrderRequest orderRequest) {
+	public ResponseEntity<OrderTotalResponse> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
 		long orderId = orderService.insertOrderItem(orderRequest);
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.location(ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(orderId).toUri())
