@@ -100,6 +100,9 @@ public class OrderService {
 			orderItem.setPrice(output.getPrice());
 			orderItem.setQuantity(output.getQty());
 			orderItem.setMessage(output.getMessage());
+		} else {
+			orderItem.setPrice(orderItem.getUnitPrice());
+			orderItem.setQuantity(orderItem.getOrderedQuantity());
 		}
 		session.persist(orderItem);
 	}
