@@ -24,7 +24,7 @@ To run this project, you will need the following:
 ```
 mvn clean install
 ```
-3. You don't have maven, download a zip file from [here](https://github.com/omidp/store/releases/download/1.0/store.zip), change the extension to jar and execute following command.
+3. You don't have maven, download a zip file from [here](https://github.com/omidp/store/releases/download/2.0/store.jar), change the extension to jar and execute following command.
 ```
 java --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED -jar store.jar
 ```
@@ -112,6 +112,8 @@ Response body
     ]
 }
 ```
+
+_After creating an order you can get the order id from HTTP response location header_
 
 Or you can use Postman collection attached to the project.
 
