@@ -3,6 +3,7 @@ package com.grocery.store.service;
 import com.grocery.store.domain.OrderEntity;
 import com.grocery.store.domain.ProductAttribute;
 import com.grocery.store.domain.ProductEntity;
+import com.grocery.store.util.ManagedSessionFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -25,45 +26,45 @@ import static org.apache.commons.lang3.RandomUtils.nextLong;
 @Slf4j
 public class BasicDataSetup {
 
-	private final SessionFactory sessionFactory;
 	private final OrderService orderService;
+	private final ManagedSessionFactory managedSessionFactory;
 
 	/**
 	 * @return orderId
 	 */
 	public Long init() {
-		sessionFactory.inTransaction(this::initProducts);
-		return sessionFactory.fromTransaction(this::initOrders);
+		managedSessionFactory.inTransaction(this::initProducts);
+		return managedSessionFactory.fromTransaction(this::initOrders);
 	}
 
 	private Long initOrders(Session session) {
 		long orderId = nextLong();
 		OrderEntity order = new OrderEntity(orderId, "Order #" + orderId);
 		session.persist(order);
-		orderBread(session, order);
-		orderVegetables(session, order);
-		orderBeers(session, order);
+		orderBread(orderId);
+		orderVegetables(orderId);
+		orderBeers(orderId);
 		log.info("##################################################################");
 		log.info("Created order with id {}", orderId);
 		log.info("##################################################################");
 		return orderId;
 	}
 
-	private void orderBeers(Session session, OrderEntity order) {
-		ProductEntity product = session.get(ProductEntity.class, 14L);
-		orderService.insertOrderItem(product, order, emptyMap(), 6, session);
+	private void orderBeers(long orderId) {
+		ProductEntity product = managedSessionFactory.getCurrentSession().get(ProductEntity.class, 14L);
+		orderService.insertOrderItem(product, orderId, emptyMap(), 6);
 	}
 
-	private void orderVegetables(Session session, OrderEntity order) {
-		ProductEntity product = session.get(ProductEntity.class, 16L);
-		orderService.insertOrderItem(product, order, Map.of(ProductAttribute.WEIGHT, "200"), 1, session);
+	private void orderVegetables(long orderId) {
+		ProductEntity product = managedSessionFactory.getCurrentSession().get(ProductEntity.class, 16L);
+		orderService.insertOrderItem(product, orderId, Map.of(ProductAttribute.WEIGHT, "200"), 1);
 	}
 
-	private void orderBread(Session session, OrderEntity order) {
-		ProductEntity product = session.get(ProductEntity.class, 11L);
-		orderService.insertOrderItem(product, order, emptyMap(), 1, session);
-		ProductEntity product2 = session.get(ProductEntity.class, 10L);
-		orderService.insertOrderItem(product2, order, emptyMap(), 1, session);
+	private void orderBread(long orderId) {
+		ProductEntity product = managedSessionFactory.getCurrentSession().get(ProductEntity.class, 11L);
+		orderService.insertOrderItem(product, orderId, emptyMap(), 1);
+		ProductEntity product2 = managedSessionFactory.getCurrentSession().get(ProductEntity.class, 10L);
+		orderService.insertOrderItem(product2, orderId, emptyMap(), 1);
 	}
 
 	private void initProducts(Session session) {
