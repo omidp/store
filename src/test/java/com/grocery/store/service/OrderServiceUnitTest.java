@@ -4,6 +4,7 @@ import com.grocery.store.domain.ProductEntity;
 import com.grocery.store.exception.NotFoundException;
 import com.grocery.store.model.OrderTotalResponse;
 import com.grocery.store.service.rule.RuleFactService;
+import com.grocery.store.util.ManagedSessionFactory;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class OrderServiceUnitTest {
 
 	@Mock
-	private SessionFactory mockSessionFactory;
+	private ManagedSessionFactory mockSessionFactory;
 	@Mock
 	private RuleFactService mockRuleFactService;
 
@@ -38,7 +39,7 @@ public class OrderServiceUnitTest {
 
 	@BeforeEach
 	void setUp() {
-		this.orderService = new OrderService(mockSessionFactory, mockRuleFactService);
+		this.orderService = new OrderService(mockRuleFactService, mockSessionFactory);
 	}
 
 	@Test
@@ -65,7 +66,7 @@ public class OrderServiceUnitTest {
 			ONE,
 			LocalDate.now().minusDays(10)
 		);
-		orderService.insertOrderItem(p, mock(), emptyMap(), 10, mock());
+		orderService.insertOrderItem(p, nextLong(), emptyMap(), 10);
 		verifyNoInteractions(mockRuleFactService);
 	}
 

@@ -1,8 +1,13 @@
 package com.grocery.store.config;
 
 import com.grocery.store.domain.PO;
+import com.grocery.store.util.ManagedSessionFactory;
 import jakarta.persistence.EntityManagerFactory;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Environment;
+import org.hibernate.context.internal.ManagedSessionContext;
+import org.hibernate.context.internal.ThreadLocalSessionContext;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +19,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class HibernateConfig {
@@ -24,6 +30,9 @@ public class HibernateConfig {
 		entityManagerFactoryBean.setDataSource(dataSource(dataSourceProperties));
 		entityManagerFactoryBean.setPackagesToScan(PO.class.getPackageName());
 		entityManagerFactoryBean.setJpaVendorAdapter(getHibernateJpaVendorAdapter(jpaProperties));
+		Properties properties = new Properties();
+		properties.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, ManagedSessionContext.class.getName());
+		entityManagerFactoryBean.setJpaProperties(properties);
 		return entityManagerFactoryBean;
 	}
 
@@ -41,6 +50,11 @@ public class HibernateConfig {
 	@DependsOn("entityManagerFactory")
 	public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
 		return new JpaTransactionManager(entityManagerFactory);
+	}
+
+	@Bean
+	public ManagedSessionFactory managedSessionFactory(SessionFactory sessionFactory){
+		return new ManagedSessionFactory(sessionFactory);
 	}
 
 	private HibernateJpaVendorAdapter getHibernateJpaVendorAdapter(JpaProperties jpaProperties) {

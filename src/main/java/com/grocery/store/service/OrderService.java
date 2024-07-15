@@ -14,9 +14,9 @@ import com.grocery.store.model.OrderResponse;
 import com.grocery.store.model.OrderTotalResponse;
 import com.grocery.store.model.rule.OrderItemRuleOutput;
 import com.grocery.store.service.rule.RuleFactService;
+import com.grocery.store.util.ManagedSessionFactory;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -30,8 +30,8 @@ import static org.apache.commons.lang3.RandomUtils.nextLong;
 @RequiredArgsConstructor
 public class OrderService {
 
-	private final SessionFactory sessionFactory;
 	private final RuleFactService ruleFactService;
+	private final ManagedSessionFactory managedSessionFactory;
 
 	public OrderTotalResponse getById(Long orderId) {
 		String hql = """
@@ -41,7 +41,7 @@ public class OrderService {
 			where oi.order.id = :orderId
 			group by p.category
 			""";
-		return sessionFactory.fromSession(session -> {
+		return managedSessionFactory.fromSession(session -> {
 			OrderEntity orderEntity = session.get(OrderEntity.class, orderId);
 			if (orderEntity == null) {
 				throw new NotFoundException("Order not found. orderId #" + orderId);
@@ -61,7 +61,7 @@ public class OrderService {
 			left join fetch oi.attributes attr
 			where oi.order.id = :orderId
 			""";
-		return sessionFactory.fromSession(session -> {
+		return managedSessionFactory.fromSession(session -> {
 			//TODO: fetch data with one query
 			OrderEntity orderEntity = session.get(OrderEntity.class, orderId);
 			if (orderEntity == null) {
@@ -75,25 +75,26 @@ public class OrderService {
 	}
 
 	public long insertOrderItem(OrderRequest orderRequest) {
-		return sessionFactory.fromTransaction(session -> {
+		return managedSessionFactory.fromTransaction(session -> {
 			long orderId = nextLong();
 			OrderEntity order = new OrderEntity(orderId, "Order #" + orderId);
 			session.persist(order);
 			for (OrderItemRequest item : orderRequest.items()) {
-				insertOrderItem(session.getReference(ProductEntity.class, item.productId()), order, item.attributes(), item.qty(), session);
+				insertOrderItem(session.getReference(ProductEntity.class, item.productId()), orderId, item.attributes(), item.qty());
 			}
 			return orderId;
 		});
 	}
 
-	public void insertOrderItem(ProductEntity product, OrderEntity order, Map<ProductAttribute, String> attributes, int qty, Session session) {
+	public void insertOrderItem(ProductEntity product, Long orderId, Map<ProductAttribute, String> attributes, int qty) {
 		if (Category.BREADS.equals(product.getCategory()) && product.getExpiryDays() > 6) {
 			return;
 		}
 		if (attributes == null) {
 			attributes = emptyMap();
 		}
-		OrderItemEntity orderItem = new OrderItemEntity(nextLong(), product.getPrice(), qty, product, order);
+		Session currentSession = managedSessionFactory.getCurrentSession();
+		OrderItemEntity orderItem = new OrderItemEntity(nextLong(), product.getPrice(), qty, product, currentSession.getReference(OrderEntity.class, orderId));
 		orderItem.setAttributes(attributes);
 		OrderItemRuleOutput output = ruleFactService.collectFact(product, orderItem, orderItem.getAttributes()).getResult();
 		if (output != null) {
@@ -104,7 +105,7 @@ public class OrderService {
 			orderItem.setPrice(orderItem.getUnitPrice());
 			orderItem.setQuantity(orderItem.getOrderedQuantity());
 		}
-		session.persist(orderItem);
+		currentSession.persist(orderItem);
 	}
 
 }
